@@ -3,7 +3,8 @@ import markdown
 
 import pandas as pd
 
-from openai import OpenAI
+# 1. Nova importação: Troca a OpenAI pela Langchain com Ollama
+from langchain_ollama import OllamaLLM
 from chromadb import PersistentClient
 from embedding import SentenceTransformerEmbeddingFunction
 from flask import Flask, request, render_template_string, render_template, jsonify
@@ -13,8 +14,11 @@ app = Flask(__name__)
 
 # Mock-up of initializing your database client and other components as necessary
 def initialize_components():
-    global openai_client, embedding_func, db_client, collection
-    openai_client = OpenAI()
+    # 2. Alteração das variáveis globais para usar o ollama_client
+    global ollama_client, embedding_func, db_client, collection
+    
+    # 3. Inicialização do modelo local qwen2.5:1.5b
+    ollama_client = OllamaLLM(model="qwen2.5:1.5b")
 
     embedding_func = SentenceTransformerEmbeddingFunction()
     embedding_func.initialize_model()
@@ -109,19 +113,13 @@ def process_query(query):
                     f"If the context does not provide information on the question respond with 'Sorry my knowledge base does not include information on that topic'" \
                     f"Ensure your answer is annotated with the Document IDs of the context that were used to answer the question. " \
                     f"Make sure you use the following format for the annotations: (Document ID 'number_given_in_context')." \
-                    f" You must use the words Document ID for each annotation."
+                    f" You must use the words Document ID for each annotation.\n\n"
 
-    completion = openai_client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": updated_query},
-            {"role": "user", "content": query}
-        ],
-        temperature=0.2,
-        max_tokens=2000
-    )
+    # 4. Alteração da chamada para invocar o modelo do Ollama em vez do ChatGPT
+    completion = ollama_client.invoke(updated_query + "User Query: " + query)
 
-    return completion.choices[0].message.content, documents
+    # 5. O Langchain retorna logo a string, não precisamos do "choices[0].message.content"
+    return completion, documents
 
 
 @app.route('/', methods=['GET', 'POST'])
