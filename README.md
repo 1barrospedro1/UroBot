@@ -5,20 +5,21 @@ UroBot is an advanced urology-specialized chatbot designed to enhance medical qu
 
 ### How to Run the UroBot Flask App Locally
 
-1. **Obtain OpenAI API Access**: 
-   - Visit the [OpenAI API Quickstart Guide](https://platform.openai.com/docs/quickstart) and follow the instructions to get your API key.
-   - Note: You will need to purchase credits to use the OpenAI API.
-
-2. **Set Up the Environment**:
-   - **Conda Users**: Create a conda environment using the `environment.yml` file:
+1. **Set Up the Environment With Conda**:
+   - Create a conda environment using the `environment.yml` file:
      ```bash
      conda env create -f environment.yml
      conda activate your_env_name
      ```
-   - **Pip Users**: Install the required packages from the `requirements.txt` file:
+
+2. **Used With Ollama**: 
+   - Install Ollama
+   - Run:
      ```bash
-     pip install -r requirements.txt
+     ollama pull qwen2.5:1.5b
+     ollama pull granite-embedding:278m
      ```
+
 
 3. **Run the Flask App**:
    - Execute the following command to start the application:
